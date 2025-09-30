@@ -21,6 +21,7 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "Building image with tag: ${IMAGE_TAG}"
           docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} ./src
           docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
           docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
@@ -29,8 +30,11 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "Pushing image: ${IMAGE_TAG}"
           docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
           docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
 
       - name: Show pushed image URI
-        run: echo "Pushed: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${{ github.sha }}"
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: echo "Pushed: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
