@@ -37,4 +37,5 @@ jobs:
       - name: Show pushed image URI
         env:
           IMAGE_TAG: ${{ github.sha }}
-        run: echo "Pushed: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
+        run: |
+          echo "Pushed: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
