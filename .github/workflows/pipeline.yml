@@ -1,0 +1,38 @@
+name: Build and Push Docker to ECR
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION: ap-south-1
+  AWS_ACCOUNT_ID: 729780141709
+  ECR_REPOSITORY: ec2-dashboard
+
+jobs:
+  build-and-push:
+    runs-on: [self-hosted]
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t ${ECR_REPOSITORY}:${IMAGE_TAG} ./src
+          docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} \
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
+          docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} \
+            ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+
+      - name: Push Docker image to ECR
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
+          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest
+
+      - name: Show pushed image URI
+        run: echo "Pushed: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${{ github.sha }}"
