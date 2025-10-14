@@ -1,0 +1,12 @@
+FROM FROM python:3.14.0-slim AS build
+ADD . / prod-app
+WORKDIR /Prod-app
+RUN pip3 install --prefix=/devops -r requirements.txt
+
+FROM python:3.14.0-slim AS runtime
+LABEL project="Prod-python-app"
+LABEL author="developer-team"
+COPY --from=build /prod-app/devops /cloud-aws
+WORKDIR /cloud-aws
+EXPOSE 5001
+CMD ["python3", "app.py"]
